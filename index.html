@@ -765,6 +765,7 @@
 </div>
 
 <!-- ORDER FORM -->
+<form id="telegramForm">
 <div class="order-section" id="order">
   <div class="order-inner">
     <div class="order-title">Замовити зараз</div>
@@ -772,19 +773,19 @@
 
     <div class="form-group">
       <label>Ваше ім'я</label>
-      <input type="text" placeholder="Іван Іванченко">
+      <input type="text" id="name" placeholder="Іван Іванченко">
     </div>
     <div class="form-group">
       <label>Номер телефону</label>
-      <input type="tel" placeholder="+380 __ ___ ____">
+      <input type="tel" id="phone" placeholder="+380 __ ___ ____">
     </div>
     <div class="form-row">
       <div class="form-group">
         <label>Місто</label>
-        <input type="text" placeholder="Київ">
+        <input type="text" id="city" placeholder="Київ">
       </div>
       <div class="form-group">
-        <label>Розмір стелажа</label>
+        <label id="size">Розмір стелажа</label>
         <select>
           <option>Стелаж металевий 150x75x30см, сірий - 1289грн</option>
           <option>Стелаж металевий 180x40x40см, сірий - 1149грн</option>
@@ -801,6 +802,8 @@
     </div>
   </div>
 </div>
+  </form> 
+<div id="status"></div>
 
 <!-- FAQ -->
 <div class="section">
@@ -877,6 +880,47 @@
       btn.style.background = '#1DB954';
     }, 1500);
   }
+  //bot
+  const TOKEN = '8430206505:AAEa6HICLRLQw7Hp7Nk7DvP6Z2_XGawFfmM';
+  const CHAT_ID = '8430206505';
+
+  document.getElementById('telegramForm').addEventListener('submit', function(e) {
+    e.preventDefault(); // Зупиняємо стандартну відправку форми
+
+    const name = document.getElementById('name').value;
+    const phone = document.getElementById('phone').value;
+    const statusDiv = document.getElementById('status');
+
+    // Формуємо текст повідомлення
+    const message = `Нова заявка!\nІм'я: ${name}\nТелефон: ${phone}`;
+
+    const url = `https://telegram.org{TOKEN}/sendMessage`;
+
+    fetch(url, {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+            chat_id: CHAT_ID,
+            text: message,
+            parse_mode: 'HTML'
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.ok) {
+            statusDiv.textContent = 'Повідомлення успішно надіслано!';
+            document.getElementById('telegramForm').reset(); // Очищуємо форму
+        } else {
+            statusDiv.textContent = 'Помилка: ' + data.description;
+        }
+    })
+    .catch(error => {
+        statusDiv.textContent = 'Сталася помилка: ' + error.message;
+    });
+});
+
 </script>
 </body>
 </html>
